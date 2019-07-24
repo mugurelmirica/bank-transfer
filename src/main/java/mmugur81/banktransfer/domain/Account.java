@@ -21,7 +21,12 @@ public class Account extends BaseEntity {
     @Column(nullable = false)
     private Currency currency;
 
+    // Amount cannot be set directly
     private BigDecimal amount = new BigDecimal(0);
+
+    private boolean withdrawAllowed;
+
+    private boolean depositAllowed;
 
     public void setHolder(Holder holder) {
         this.holder = holder;
@@ -33,6 +38,14 @@ public class Account extends BaseEntity {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public void setWithdrawAllowed(boolean withdrawalAllowed) {
+        this.withdrawAllowed = withdrawalAllowed;
+    }
+
+    public void setDepositAllowed(boolean depositAllowed) {
+        this.depositAllowed = depositAllowed;
     }
 
     @Override

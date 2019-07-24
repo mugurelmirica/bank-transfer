@@ -10,6 +10,7 @@ import mmugur81.banktransfer.controller.AccountController;
 import mmugur81.banktransfer.controller.HolderController;
 import mmugur81.banktransfer.repository.HibernateUtil;
 import org.apache.http.HttpStatus;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -49,6 +50,11 @@ public class Application {
         app.exception(EntityNotFoundException.class, (e, ctx) -> {
             ctx.status(HttpStatus.SC_NOT_FOUND);
             ctx.result(e.getMessage());
+        });
+
+        app.exception(ConstraintViolationException.class, (e, ctx) -> {
+            ctx.status(HttpStatus.SC_BAD_REQUEST);
+            ctx.result(e.getCause().getMessage());
         });
     }
 }
