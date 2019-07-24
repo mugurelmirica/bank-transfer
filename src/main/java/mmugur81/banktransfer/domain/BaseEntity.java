@@ -1,6 +1,8 @@
 package mmugur81.banktransfer.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,6 +20,8 @@ public class BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
+    @CreationTimestamp
     private ZonedDateTime created;
 
     public BaseEntity() {

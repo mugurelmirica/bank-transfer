@@ -1,14 +1,21 @@
 package mmugur81.banktransfer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.javalin.Javalin;
+import io.javalin.plugin.json.JavalinJackson;
 import mmugur81.banktransfer.controller.HolderController;
 import mmugur81.banktransfer.repository.HibernateUtil;
 
 public class Application {
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(/*new AppModule()*/);
+        Injector injector = Guice.createInjector();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        JavalinJackson.configure(objectMapper);
 
         Javalin app = Javalin.create();
 
