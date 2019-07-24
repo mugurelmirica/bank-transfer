@@ -4,7 +4,6 @@ import com.google.inject.ImplementedBy;
 import mmugur81.banktransfer.domain.Holder;
 
 @ImplementedBy(HolderServiceImpl.class)
-public interface HolderService {
+public interface HolderService extends CRUDService<Holder> {
 
-    Holder create(Holder holder);
 }

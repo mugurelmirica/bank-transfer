@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 
 @Singleton
 public class HolderController {
+    public static final String PATH = "/api/holder";
 
     private final HolderService holderService;
 
@@ -23,5 +24,13 @@ public class HolderController {
             Holder holder = JavalinJson.fromJson(context.body(), Holder.class);
             context.json(holderService.create(holder));
         };
+    }
+
+    public Handler get() {
+        return context -> context.json(holderService.get(Long.valueOf(context.pathParam("id"))));
+    }
+
+    public Handler list() {
+        return context -> context.json(holderService.list());
     }
 }

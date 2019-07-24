@@ -4,7 +4,6 @@ import com.google.inject.ImplementedBy;
 import mmugur81.banktransfer.domain.Account;
 
 @ImplementedBy(AccountServiceImpl.class)
-public interface AccountService {
+public interface AccountService extends CRUDService<Account> {
 
-    Account create(Account account);
 }

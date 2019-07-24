@@ -31,7 +31,9 @@ public class Application {
         app.get("/", ctx -> ctx.result("Bank transfer application"));
 
         HolderController holderController = injector.getInstance(HolderController.class);
-        app.post("/holder", holderController.create());
+        app.post(HolderController.PATH, holderController.create());
+        app.get(HolderController.PATH, holderController.list());
+        app.get(HolderController.PATH + "/:id", holderController.get());
 
     }
 }
