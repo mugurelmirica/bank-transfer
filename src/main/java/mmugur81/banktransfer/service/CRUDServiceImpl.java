@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.Optional;
 
 public class CRUDServiceImpl<T> implements CRUDService<T> {
     private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
@@ -26,13 +27,13 @@ public class CRUDServiceImpl<T> implements CRUDService<T> {
     }
 
     @Override
-    public T get(long id) {
+    public Optional<T> get(long id) {
         T result;
         try (Session session = sessionFactory.openSession()) {
             result = (T) session.get(typeName, id);
         }
 
-        return result;
+        return Optional.ofNullable(result);
     }
 
     @Override

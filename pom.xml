@@ -52,6 +52,12 @@
             <version>2.9.8</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
         <!--TODO remove unnecessary-->
         <dependency>
             <groupId>mysql</groupId>

@@ -2,24 +2,26 @@ package mmugur81.banktransfer.domain;
 
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Objects;
 
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"iban", "currency"})})
 @Getter
 public class Account extends BaseEntity {
 
     @OneToOne
     private Holder holder;
 
+    @Column(nullable = false)
     private String iban;
 
+    @Column(nullable = false)
     private Currency currency;
 
-    private BigDecimal amount;
+    private BigDecimal amount = new BigDecimal(0);
 
     public void setHolder(Holder holder) {
         this.holder = holder;

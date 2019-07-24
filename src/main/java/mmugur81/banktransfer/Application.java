@@ -6,11 +6,16 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.plugin.json.JavalinJackson;
+import mmugur81.banktransfer.controller.AccountController;
 import mmugur81.banktransfer.controller.HolderController;
 import mmugur81.banktransfer.repository.HibernateUtil;
+import org.apache.http.HttpStatus;
+
+import javax.persistence.EntityNotFoundException;
 
 public class Application {
     public static void main(String[] args) {
+        // Guice DI
         Injector injector = Guice.createInjector();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -35,5 +40,15 @@ public class Application {
         app.get(HolderController.PATH, holderController.list());
         app.get(HolderController.PATH + "/:id", holderController.get());
 
+        AccountController accountController = injector.getInstance(AccountController.class);
+        app.post(AccountController.PATH, accountController.create());
+        app.get(AccountController.PATH, accountController.list());
+        app.get(AccountController.PATH + "/:id", accountController.get());
+
+        // Handle some errors
+        app.exception(EntityNotFoundException.class, (e, ctx) -> {
+            ctx.status(HttpStatus.SC_NOT_FOUND);
+            ctx.result(e.getMessage());
+        });
     }
 }
