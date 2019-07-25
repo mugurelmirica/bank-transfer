@@ -2,6 +2,7 @@ package mmugur81.banktransfer.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Getter
+@Setter
 @MappedSuperclass
 public class BaseEntity implements Serializable {
 

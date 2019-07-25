@@ -75,18 +75,19 @@ public class Transfer extends BaseEntity {
      * Verify transfer possible
      */
     public void verify() throws TransferException {
-        // lock both accounts
+        myLog("verifying ", source.getId(), target.getId());
+
+        // Lock both accounts
         synchronized (source) {
             synchronized (target) {
-                log("into lock", source.getId(), target.getId());
-                log(" source: " + source.toString(), source.getId(), target.getId());
+                myLog("into lock ***************", source.getId(), target.getId());
 
-                // TODO DEBUG and remove
-                try {
+                // TODO after DEBUG remove
+                /*try {
                     Thread.sleep(target.getId() == 2 ? 5000 : 100);
                 } catch (InterruptedException ignored) {
                     ignored.printStackTrace();
-                }
+                }*/
 
                 // [1] Check accounts differ
                 if (source.equals(target)) {
@@ -114,23 +115,33 @@ public class Transfer extends BaseEntity {
                 }
             }
         }
-        log("exit lock", source.getId(), target.getId());
+        myLog("exit lock", source.getId(), target.getId());
     }
 
     /**
      * Actual processing of the transfer
      */
     public void process() throws TransferAlreadyProcessedException {
+        myLog("processing ", source.getId(), target.getId());
         if (processed) {
             throw new TransferAlreadyProcessedException(getId());
         }
 
-        source.withdraw(amountInSourceCurrency);
-        target.deposit(amountInTargetCurrency);
-        processed = true;
+        // Lock both accounts
+        synchronized (source) {
+            synchronized (target) {
+                myLog("into lock ***************", source.getId(), target.getId());
+
+                source.withdraw(amountInSourceCurrency);
+                target.deposit(amountInTargetCurrency);
+                processed = true;
+
+                myLog("exit lock ***************", source.getId(), target.getId());
+            }
+        }
     }
 
-    private void log(String message, long sourceId, long targetId) {
+    private void myLog(String message, long sourceId, long targetId) {
         log.info(String.format("[Pid:%s] Transfer [%s -> %s] ",
                 Thread.currentThread().getId(), sourceId, targetId).concat(message));
     }

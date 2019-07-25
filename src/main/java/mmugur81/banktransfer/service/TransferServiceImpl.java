@@ -29,7 +29,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public Transfer create(TransferDto dto) throws TransferException {
         Transfer transfer;
-        log("init", dto.getSourceAccountId(), dto.getTargetAccountId());
+        myLog("init", dto.getSourceAccountId(), dto.getTargetAccountId());
 
         // [1] Check ids are correct
         Account source = accountService.get(dto.getSourceAccountId()).orElseThrow(
@@ -53,7 +53,7 @@ public class TransferServiceImpl implements TransferService {
         try {
             transfer.verify();
         } catch (TransferException e) {
-            log("wil leave lock", source.getId(), target.getId());
+            myLog("wil leave lock", source.getId(), target.getId());
             throw e;
         }
 
@@ -64,7 +64,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public void process(Transfer transfer) throws TransferException {
         // Do the same verification, because conditions might have changed
-        log("processing", transfer.getSource().getId(), transfer.getTarget().getId());
+        myLog("processing", transfer.getSource().getId(), transfer.getTarget().getId());
 
         // Verify again
         transfer.verify();
@@ -76,7 +76,7 @@ public class TransferServiceImpl implements TransferService {
         transferCRUDService.update(transfer);
     }
 
-    private void log(String message, long sourceId, long targetId) {
+    private void myLog(String message, long sourceId, long targetId) {
         log.info(String.format("[Pid:%s] Transfer [%s -> %s] ",
                 Thread.currentThread().getId(), sourceId, targetId).concat(message));
     }

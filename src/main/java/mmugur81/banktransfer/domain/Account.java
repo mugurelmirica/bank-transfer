@@ -31,6 +31,21 @@ public class Account extends BaseEntity {
     @JsonIgnore
     private boolean depositAllowed;
 
+    public static Account copyFrom(Account other) {
+        Account newCopy = new Account();
+
+        newCopy.setId(other.getId());
+        newCopy.setCreated(other.getCreated());
+        newCopy.holder = other.holder;
+        newCopy.iban = other.iban;
+        newCopy.currency = other.currency;
+        newCopy.amount = other.amount;
+        newCopy.withdrawAllowed = other.withdrawAllowed;
+        newCopy.depositAllowed = other.depositAllowed;
+
+        return newCopy;
+    }
+
     public void setHolder(Holder holder) {
         this.holder = holder;
     }
@@ -51,17 +66,17 @@ public class Account extends BaseEntity {
         this.depositAllowed = depositAllowed;
     }
 
-    public synchronized void withdraw(BigDecimal amountToWithdraw) {
+    public void withdraw(BigDecimal amountToWithdraw) {
         // Maybe i should check if operation possible
         amount = amount.subtract(amountToWithdraw);
     }
 
-    public synchronized void deposit(BigDecimal amountToDeposit) {
+    public void deposit(BigDecimal amountToDeposit) {
         // Maybe i should check if operation possible
         amount = amount.add(amountToDeposit);
     }
 
-    public synchronized BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
