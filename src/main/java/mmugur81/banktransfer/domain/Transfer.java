@@ -2,7 +2,14 @@ package mmugur81.banktransfer.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import mmugur81.banktransfer.exception.AccountsIdenticalException;
+import mmugur81.banktransfer.exception.InsufficientFundsException;
+import mmugur81.banktransfer.exception.NegativeOrZeroException;
+import mmugur81.banktransfer.exception.NotAllowedToDepositException;
+import mmugur81.banktransfer.exception.NotAllowedToWithdrawException;
 import mmugur81.banktransfer.exception.TransferAlreadyProcessedException;
+import mmugur81.banktransfer.exception.TransferException;
 
 import javax.persistence.Column;
 import javax.persistence.OneToOne;
@@ -10,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Objects;
 
+@Log
 @Getter
 @RequiredArgsConstructor
 public class Transfer extends BaseEntity {
@@ -64,6 +72,52 @@ public class Transfer extends BaseEntity {
     }
 
     /**
+     * Verify transfer possible
+     */
+    public void verify() throws TransferException {
+        // lock both accounts
+        synchronized (source) {
+            synchronized (target) {
+                log("into lock", source.getId(), target.getId());
+                log(" source: " + source.toString(), source.getId(), target.getId());
+
+                // TODO DEBUG and remove
+                try {
+                    Thread.sleep(target.getId() == 2 ? 5000 : 100);
+                } catch (InterruptedException ignored) {
+                    ignored.printStackTrace();
+                }
+
+                // [1] Check accounts differ
+                if (source.equals(target)) {
+                    throw new AccountsIdenticalException(source);
+                }
+
+                // [2] check source account has the right to withdraw
+                if (!source.isWithdrawAllowed()) {
+                    throw new NotAllowedToWithdrawException(source);
+                }
+
+                // [3] check target account has the right to deposit
+                if (!target.isDepositAllowed()) {
+                    throw new NotAllowedToDepositException(source);
+                }
+
+                // [4] check the amount is positive
+                if (amountInSourceCurrency.compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new NegativeOrZeroException(source);
+                }
+
+                // [5] check source account has enough money
+                if (source.getAmount().compareTo(amountInSourceCurrency) < 0) {
+                    throw new InsufficientFundsException(source);
+                }
+            }
+        }
+        log("exit lock", source.getId(), target.getId());
+    }
+
+    /**
      * Actual processing of the transfer
      */
     public void process() throws TransferAlreadyProcessedException {
@@ -74,5 +128,10 @@ public class Transfer extends BaseEntity {
         source.withdraw(amountInSourceCurrency);
         target.deposit(amountInTargetCurrency);
         processed = true;
+    }
+
+    private void log(String message, long sourceId, long targetId) {
+        log.info(String.format("[Pid:%s] Transfer [%s -> %s] ",
+                Thread.currentThread().getId(), sourceId, targetId).concat(message));
     }
 }

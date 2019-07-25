@@ -65,9 +65,11 @@ public class Application {
         });
 
         app.exception(TransferException.class, (e, ctx) -> {
-            log.warning(e.getMessage());
+            log.warning("[Pid:" + Thread.currentThread().getId() + "] " + e.getMessage());
             ctx.status(HttpStatus.SC_BAD_REQUEST);
             ctx.result(e.getMessage());
         });
+
+        log.info("\n************ APP LOADED ********************************************************\n");
     }
 }

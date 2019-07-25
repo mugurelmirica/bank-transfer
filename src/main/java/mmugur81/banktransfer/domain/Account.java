@@ -1,5 +1,6 @@
 package mmugur81.banktransfer.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -24,8 +25,10 @@ public class Account extends BaseEntity {
     // Amount cannot be set directly
     private BigDecimal amount = new BigDecimal(0);
 
+    @JsonIgnore
     private boolean withdrawAllowed;
 
+    @JsonIgnore
     private boolean depositAllowed;
 
     public void setHolder(Holder holder) {
@@ -48,15 +51,17 @@ public class Account extends BaseEntity {
         this.depositAllowed = depositAllowed;
     }
 
-    public void withdraw(BigDecimal amountToWithdraw) {
+    public synchronized void withdraw(BigDecimal amountToWithdraw) {
+        // Maybe i should check if operation possible
         amount = amount.subtract(amountToWithdraw);
     }
 
-    public void deposit(BigDecimal amountToDeposit) {
+    public synchronized void deposit(BigDecimal amountToDeposit) {
+        // Maybe i should check if operation possible
         amount = amount.add(amountToDeposit);
     }
 
-    public BigDecimal getAmount() {
+    public synchronized BigDecimal getAmount() {
         return amount;
     }
 

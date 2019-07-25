@@ -1,21 +1,14 @@
 package mmugur81.banktransfer.service;
 
-import com.google.common.collect.ImmutableSet;
 import lombok.extern.java.Log;
 import mmugur81.banktransfer.domain.Account;
 import mmugur81.banktransfer.domain.Transfer;
 import mmugur81.banktransfer.dto.TransferDto;
-import mmugur81.banktransfer.exception.AccountsIdenticalException;
-import mmugur81.banktransfer.exception.InsufficientFundsException;
-import mmugur81.banktransfer.exception.NegativeOrZeroException;
-import mmugur81.banktransfer.exception.NotAllowedToDepositException;
-import mmugur81.banktransfer.exception.NotAllowedToWithdrawException;
 import mmugur81.banktransfer.exception.TransferException;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.util.Set;
 
 @Log
 public class TransferServiceImpl implements TransferService {
@@ -36,14 +29,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public Transfer create(TransferDto dto) throws TransferException {
         Transfer transfer;
-        log.info(String.format("Transfer [%s -> %s]", dto.getSourceAccountId(), dto.getTargetAccountId()));
-
-        // TODO DEBUG and remove
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ignored) {
-            ignored.printStackTrace();
-        }
+        log("init", dto.getSourceAccountId(), dto.getTargetAccountId());
 
         // [1] Check ids are correct
         Account source = accountService.get(dto.getSourceAccountId()).orElseThrow(
@@ -60,73 +46,38 @@ public class TransferServiceImpl implements TransferService {
         BigDecimal amountInTargetCurrency = currencyConverter
                 .convert(dto.getCurrency(), target.getCurrency(), dto.getAmount());
 
-        // [4] Lock both accounts, while checks are performed
-        Set<Account> lockedAccounts = ImmutableSet.of(source, target);
-        log.info(String.format("Transfer [%s -> %s] entering lock", dto.getSourceAccountId(), dto.getTargetAccountId()));
-        //TODO use individual locks; it makes more sense
-        synchronized (lockedAccounts) {
-            log.info(String.format("Transfer [%s -> %s] into lock", dto.getSourceAccountId(), dto.getTargetAccountId()));
+        // [5] Create the transfer object
+        transfer = new Transfer(source, target, dto.getCurrency(), dto.getAmount(), amountInSourceCurrency, amountInTargetCurrency);
 
-            // [5] Perform some checks on accounts
-            verifyTransferPossible(source, amountInSourceCurrency, target);
+        // [6] Perform some checks on accounts
+        try {
+            transfer.verify();
+        } catch (TransferException e) {
+            log("wil leave lock", source.getId(), target.getId());
+            throw e;
+        }
 
-            // [6] store transfer for later processing
-            transfer = transferCRUDService.create(new Transfer(
-                    source, target, dto.getCurrency(), dto.getAmount(), amountInSourceCurrency, amountInTargetCurrency));
-
-        }// [7] Release locks on accounts
-        log.info(String.format("Transfer [%s -> %s] exit lock", dto.getSourceAccountId(), dto.getTargetAccountId()));
-
-        return transfer;
+        // [7] store transfer for later processing
+        return transferCRUDService.create(transfer);
     }
 
     @Override
     public void process(Transfer transfer) throws TransferException {
         // Do the same verification, because conditions might have changed
-        log.info(String.format("Transfer [%s -> %s] processing", transfer.getSource().getId(), transfer.getTarget().getId()));
+        log("processing", transfer.getSource().getId(), transfer.getTarget().getId());
 
-        // Lock both accounts, while checks are performed
-        Set<Account> lockedAccounts = ImmutableSet.of(transfer.getSource(), transfer.getTarget());
-        synchronized (lockedAccounts) {
-            log.info(String.format("Transfer [%s -> %s] into lock", transfer.getSource().getId(), transfer.getTarget().getId()));
-            verifyTransferPossible(transfer.getSource(), transfer.getAmountInSourceCurrency(), transfer.getTarget());
+        // Verify again
+        transfer.verify();
 
-            //Do the actual transfer
-            transfer.process();
+        //Do the actual transfer
+        transfer.process();
 
-            // Mark the transfer as processed
-            transferCRUDService.update(transfer);
-
-        }// Release locks on accounts
-        log.info(String.format("Transfer [%s -> %s] exit lock", transfer.getSource().getId(), transfer.getTarget().getId()));
+        // Mark the transfer as processed
+        transferCRUDService.update(transfer);
     }
 
-    private void verifyTransferPossible(Account source, BigDecimal amountInSourceCurrency, Account target)
-            throws TransferException {
-
-        // [1] Check accounts differ
-        if (source.equals(target)) {
-            throw new AccountsIdenticalException(source);
-        }
-
-        // [2] check source account has the right to withdraw
-        if (!source.isWithdrawAllowed()) {
-            throw new NotAllowedToWithdrawException(source);
-        }
-
-        // [3] check target account has the right to deposit
-        if (!target.isDepositAllowed()) {
-            throw new NotAllowedToDepositException(source);
-        }
-
-        // [4] check the amount is positive
-        if (amountInSourceCurrency.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new NegativeOrZeroException(source);
-        }
-
-        // [5] check source account has enough money
-        if (source.getAmount().compareTo(amountInSourceCurrency) < 0) {
-            throw new InsufficientFundsException(source);
-        }
+    private void log(String message, long sourceId, long targetId) {
+        log.info(String.format("[Pid:%s] Transfer [%s -> %s] ",
+                Thread.currentThread().getId(), sourceId, targetId).concat(message));
     }
 }
