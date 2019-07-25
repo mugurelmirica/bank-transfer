@@ -6,14 +6,18 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.plugin.json.JavalinJackson;
+import lombok.extern.java.Log;
 import mmugur81.banktransfer.controller.AccountController;
 import mmugur81.banktransfer.controller.HolderController;
+import mmugur81.banktransfer.controller.TransferController;
+import mmugur81.banktransfer.exception.TransferException;
 import mmugur81.banktransfer.repository.HibernateUtil;
 import org.apache.http.HttpStatus;
 import org.hibernate.exception.ConstraintViolationException;
 
 import javax.persistence.EntityNotFoundException;
 
+@Log
 public class Application {
     public static void main(String[] args) {
         // Guice DI
@@ -33,7 +37,7 @@ public class Application {
 
         app.start(7000);
 
-        // Define routes
+        // Define routes -----------------------------------------------------------------------------------------------
         app.get("/", ctx -> ctx.result("Bank transfer application"));
 
         HolderController holderController = injector.getInstance(HolderController.class);
@@ -46,7 +50,10 @@ public class Application {
         app.get(AccountController.PATH, accountController.list());
         app.get(AccountController.PATH + "/:id", accountController.get());
 
-        // Handle some errors
+        TransferController transferController = injector.getInstance(TransferController.class);
+        app.post(TransferController.PATH, transferController.createAndProcess());
+
+        // Handle some errors ------------------------------------------------------------------------------------------
         app.exception(EntityNotFoundException.class, (e, ctx) -> {
             ctx.status(HttpStatus.SC_NOT_FOUND);
             ctx.result(e.getMessage());
@@ -55,6 +62,12 @@ public class Application {
         app.exception(ConstraintViolationException.class, (e, ctx) -> {
             ctx.status(HttpStatus.SC_BAD_REQUEST);
             ctx.result(e.getCause().getMessage());
+        });
+
+        app.exception(TransferException.class, (e, ctx) -> {
+            log.warning(e.getMessage());
+            ctx.status(HttpStatus.SC_BAD_REQUEST);
+            ctx.result(e.getMessage());
         });
     }
 }

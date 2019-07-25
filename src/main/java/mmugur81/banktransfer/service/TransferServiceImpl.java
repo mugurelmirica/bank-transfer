@@ -1,6 +1,7 @@
 package mmugur81.banktransfer.service;
 
 import com.google.common.collect.ImmutableSet;
+import lombok.extern.java.Log;
 import mmugur81.banktransfer.domain.Account;
 import mmugur81.banktransfer.domain.Transfer;
 import mmugur81.banktransfer.dto.TransferDto;
@@ -16,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Set;
 
+@Log
 public class TransferServiceImpl implements TransferService {
 
     private final CRUDServiceImpl<Transfer> transferCRUDService;
@@ -34,10 +36,11 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public Transfer create(TransferDto dto) throws TransferException {
         Transfer transfer;
+        log.info(String.format("Transfer [%s -> %s]", dto.getSourceAccountId(), dto.getTargetAccountId()));
 
         // TODO DEBUG and remove
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException ignored) {
             ignored.printStackTrace();
         }
@@ -59,7 +62,10 @@ public class TransferServiceImpl implements TransferService {
 
         // [4] Lock both accounts, while checks are performed
         Set<Account> lockedAccounts = ImmutableSet.of(source, target);
+        log.info(String.format("Transfer [%s -> %s] entering lock", dto.getSourceAccountId(), dto.getTargetAccountId()));
+        //TODO use individual locks; it makes more sense
         synchronized (lockedAccounts) {
+            log.info(String.format("Transfer [%s -> %s] into lock", dto.getSourceAccountId(), dto.getTargetAccountId()));
 
             // [5] Perform some checks on accounts
             verifyTransferPossible(source, amountInSourceCurrency, target);
@@ -69,6 +75,7 @@ public class TransferServiceImpl implements TransferService {
                     source, target, dto.getCurrency(), dto.getAmount(), amountInSourceCurrency, amountInTargetCurrency));
 
         }// [7] Release locks on accounts
+        log.info(String.format("Transfer [%s -> %s] exit lock", dto.getSourceAccountId(), dto.getTargetAccountId()));
 
         return transfer;
     }
@@ -76,10 +83,12 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public void process(Transfer transfer) throws TransferException {
         // Do the same verification, because conditions might have changed
+        log.info(String.format("Transfer [%s -> %s] processing", transfer.getSource().getId(), transfer.getTarget().getId()));
 
         // Lock both accounts, while checks are performed
         Set<Account> lockedAccounts = ImmutableSet.of(transfer.getSource(), transfer.getTarget());
         synchronized (lockedAccounts) {
+            log.info(String.format("Transfer [%s -> %s] into lock", transfer.getSource().getId(), transfer.getTarget().getId()));
             verifyTransferPossible(transfer.getSource(), transfer.getAmountInSourceCurrency(), transfer.getTarget());
 
             //Do the actual transfer
@@ -89,6 +98,7 @@ public class TransferServiceImpl implements TransferService {
             transferCRUDService.update(transfer);
 
         }// Release locks on accounts
+        log.info(String.format("Transfer [%s -> %s] exit lock", transfer.getSource().getId(), transfer.getTarget().getId()));
     }
 
     private void verifyTransferPossible(Account source, BigDecimal amountInSourceCurrency, Account target)

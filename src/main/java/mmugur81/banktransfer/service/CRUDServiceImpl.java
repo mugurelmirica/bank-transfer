@@ -11,9 +11,20 @@ import java.util.Optional;
 public class CRUDServiceImpl<T> implements CRUDService<T> {
     private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
-    private String typeName = ((ParameterizedType) getClass().getGenericSuperclass())
-            .getActualTypeArguments()[0]
-            .getTypeName();
+    private final String typeName;
+
+    public CRUDServiceImpl() {
+        String classname;
+        try {
+            classname = ((ParameterizedType) getClass().getGenericSuperclass())
+                    .getActualTypeArguments()[0]
+                    .getTypeName();
+        } catch (ClassCastException e) {
+            classname = getClass().getGenericSuperclass().getTypeName();
+
+        }
+        typeName = classname;
+    }
 
     @Override
     public T create(T t) {
