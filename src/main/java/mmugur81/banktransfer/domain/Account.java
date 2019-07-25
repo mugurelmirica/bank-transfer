@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Objects;
 
@@ -14,48 +16,28 @@ import java.util.Objects;
 public class Account extends BaseEntity {
 
     @OneToOne
-    private Holder holder;
+    private final Holder holder;
 
     @Column(nullable = false)
-    private String iban;
+    private final String iban;
 
     @Column(nullable = false)
-    private Currency currency;
+    private final Currency currency;
 
     // Amount cannot be set directly
     private BigDecimal amount = new BigDecimal(0);
 
     @JsonIgnore
-    private boolean withdrawAllowed;
+    private boolean withdrawAllowed = true;
 
     @JsonIgnore
-    private boolean depositAllowed;
+    private boolean depositAllowed = true;
 
-    public static Account copyFrom(Account other) {
-        Account newCopy = new Account();
-
-        newCopy.setId(other.getId());
-        newCopy.setCreated(other.getCreated());
-        newCopy.holder = other.holder;
-        newCopy.iban = other.iban;
-        newCopy.currency = other.currency;
-        newCopy.amount = other.amount;
-        newCopy.withdrawAllowed = other.withdrawAllowed;
-        newCopy.depositAllowed = other.depositAllowed;
-
-        return newCopy;
-    }
-
-    public void setHolder(Holder holder) {
+    public Account(Holder holder, String iban, Currency currency, BigDecimal initialAmount) {
         this.holder = holder;
-    }
-
-    public void setIban(String iban) {
         this.iban = iban;
-    }
-
-    public void setCurrency(Currency currency) {
         this.currency = currency;
+        this.amount = initialAmount.round(new MathContext(2, RoundingMode.HALF_DOWN));
     }
 
     public void setWithdrawAllowed(boolean withdrawalAllowed) {

@@ -36,11 +36,7 @@ public class AccountServiceImpl extends CRUDServiceImpl<Account> implements Acco
         Holder holder = holderService.get(holderId)
                 .orElseThrow(() -> new EntityNotFoundException("Holder with id " + holderId + " not found"));
 
-        Account account = new Account();
-
-        account.setHolder(holder);
-        account.setIban(dto.getIban());
-        account.setCurrency(dto.getCurrency());
+        Account account = new Account(holder, dto.getIban(), dto.getCurrency(), dto.getInitialAmount());
 
         // Call CRUDServiceImpl.create
         return create(account);
