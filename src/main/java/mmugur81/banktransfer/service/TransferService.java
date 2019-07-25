@@ -10,5 +10,5 @@ public interface TransferService {
 
     Transfer create(TransferDto dto) throws TransferException;
 
-    void process(Transfer transfer);
+    void process(Transfer transfer) throws TransferException;
 }

@@ -10,4 +10,6 @@ public interface CRUDService<T> {
     Optional<T> get(long id);
 
     List<T> list();
+
+    void update(T t);
 }

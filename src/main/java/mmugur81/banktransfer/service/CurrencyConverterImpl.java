@@ -43,6 +43,7 @@ public class CurrencyConverterImpl implements CurrencyConverter {
 
     private BigDecimal rateToEur(Currency currency) {
         BigDecimal rate = rates.get(currency);
+        // If rate doesn't exist consider a rate of 1, or alternatively we can throw an exception
         if (rate == null) {
             return BigDecimal.ONE;
         }

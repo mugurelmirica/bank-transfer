@@ -46,4 +46,11 @@ public class CRUDServiceImpl<T> implements CRUDService<T> {
 
         return list;
     }
+
+    @Override
+    public void update(T t) {
+        try (Session session = sessionFactory.openSession()) {
+            session.update(t);
+        }
+    }
 }

@@ -2,7 +2,7 @@ package mmugur81.banktransfer.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Immutable;
+import mmugur81.banktransfer.exception.TransferAlreadyProcessedException;
 
 import javax.persistence.Column;
 import javax.persistence.OneToOne;
@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Objects;
 
-@Immutable
 @Getter
 @RequiredArgsConstructor
 public class Transfer extends BaseEntity {
@@ -37,13 +36,15 @@ public class Transfer extends BaseEntity {
      * Final converted amount that will be withdrawn from source account
      */
     @Column(nullable = false)
-    private final BigDecimal sourceAmount;
+    private final BigDecimal amountInSourceCurrency;
 
     /**
      * Final converted amount that will be added to target account
      */
     @Column(nullable = false)
-    private final BigDecimal targetAmount;
+    private final BigDecimal amountInTargetCurrency;
+
+    private boolean processed = false;
 
     @Override
     public boolean equals(Object o) {
@@ -60,5 +61,18 @@ public class Transfer extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getSource(), getTarget(), getCurrency(), getAmount());
+    }
+
+    /**
+     * Actual processing of the transfer
+     */
+    public void process() throws TransferAlreadyProcessedException {
+        if (processed) {
+            throw new TransferAlreadyProcessedException(getId());
+        }
+
+        source.withdraw(amountInSourceCurrency);
+        target.deposit(amountInTargetCurrency);
+        processed = true;
     }
 }

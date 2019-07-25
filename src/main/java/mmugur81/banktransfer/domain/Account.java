@@ -48,6 +48,18 @@ public class Account extends BaseEntity {
         this.depositAllowed = depositAllowed;
     }
 
+    public void withdraw(BigDecimal amountToWithdraw) {
+        amount = amount.subtract(amountToWithdraw);
+    }
+
+    public void deposit(BigDecimal amountToDeposit) {
+        amount = amount.add(amountToDeposit);
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
