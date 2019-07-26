@@ -1,24 +1,16 @@
 package mmugur81.banktransfer.domain;
 
+import mmugur81.banktransfer.TestUtils;
 import mmugur81.banktransfer.exception.*;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
+import static mmugur81.banktransfer.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TransferTest {
-
-    private static final Currency EURO = Currency.getInstance("EUR");
-    private static final Currency DOLLAR = Currency.getInstance("USD");
-
-    private static final BigDecimal ZERO = BigDecimal.ZERO;
-    private static final BigDecimal no100 = BigDecimal.valueOf(100);
-
-    private static final String IBAN1 = "GB11BARC20035347275952";
-    private static final String IBAN2 = "GB16BARC20038073137852";
 
     @Test
     public void verifyFailsIfAccountsIdentical() {
@@ -107,19 +99,5 @@ public class TransferTest {
 
         // Failed processing
         assertThrows(TransferAlreadyProcessedException.class, transfer::process);
-    }
-
-    private Account newAccount(long id, String iban, Currency currency, BigDecimal initialAmount) {
-        Account account = new Account(newHolder(), iban, currency, initialAmount);
-        account.setId(id);
-
-        return account;
-    }
-
-    private Holder newHolder() {
-        Holder holder = new Holder();
-        holder.setName("TEST");
-
-        return holder;
     }
 }
