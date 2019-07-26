@@ -7,6 +7,7 @@ import mmugur81.banktransfer.service.HolderService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityNotFoundException;
 
 @Singleton
 public class HolderController {
@@ -27,7 +28,10 @@ public class HolderController {
     }
 
     public Handler get() {
-        return context -> context.json(holderService.get(Long.valueOf(context.pathParam("id"))));
+        return context -> context.json(
+                holderService.get(Long.valueOf(context.pathParam("id")))
+                .orElseThrow(EntityNotFoundException::new)
+        );
     }
 
     public Handler list() {

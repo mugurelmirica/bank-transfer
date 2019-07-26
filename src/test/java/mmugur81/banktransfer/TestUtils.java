@@ -22,15 +22,15 @@ public class TestUtils {
     }
 
     public static Account newAccount(long id, String iban, Currency currency, BigDecimal initialAmount) {
-        Account account = new Account(newHolder(), iban, currency, initialAmount);
+        Account account = new Account(newHolder("Test"), iban, currency, initialAmount);
         account.setId(id);
 
         return account;
     }
 
-    public static Holder newHolder() {
+    public static Holder newHolder(String name) {
         Holder holder = new Holder();
-        holder.setName("TEST");
+        holder.setName(name);
 
         return holder;
     }

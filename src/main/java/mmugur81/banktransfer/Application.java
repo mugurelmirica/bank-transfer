@@ -35,7 +35,9 @@ public class Application {
             event.serverStopped(HibernateUtil::shutdown);
         });
 
-        app.start(7000);
+        // Default port is 7000
+        int port = Integer.parseInt(args.length > 0 ? args[0] : "7000");
+        app.start(port);
 
         // Define routes -----------------------------------------------------------------------------------------------
         app.get("/", ctx -> ctx.result("Bank transfer application"));
@@ -72,7 +74,7 @@ public class Application {
         });
 
         log.info(" *******************************************************************************************\n"
-                + "                               APP STARTED                                                        \n"
+                + "                               APP STARTED on port " + port + "                                         \n"
                 + "       *******************************************************************************************\n");
     }
 }
