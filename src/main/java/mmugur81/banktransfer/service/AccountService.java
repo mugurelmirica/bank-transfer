@@ -8,4 +8,6 @@ import mmugur81.banktransfer.dto.AccountDto;
 public interface AccountService extends CRUDService<Account> {
 
     Account create(AccountDto dto);
+
+    Account getManaged(long id);
 }

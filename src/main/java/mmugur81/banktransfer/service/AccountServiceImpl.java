@@ -17,7 +17,7 @@ import java.util.Optional;
 public class AccountServiceImpl extends CRUDServiceImpl<Account> implements AccountService {
 
     /**
-     * Used as a workaround for synchronisation.
+     * Used as a workaround for synchronisation. TODO find a better solution like locking the row in DB
      */
     private static final Map<Long, Account> loadedAccounts = new HashMap<>();
 
@@ -58,4 +58,11 @@ public class AccountServiceImpl extends CRUDServiceImpl<Account> implements Acco
         log.info("Account " + id + " got from cache");
         return Optional.of(account);
     }
+
+    @Override
+    public Account getManaged(long id) {
+        return super.get(id)
+                .orElseThrow(() -> new EntityNotFoundException("Account with id " + id + " not found"));
+    }
+
 }

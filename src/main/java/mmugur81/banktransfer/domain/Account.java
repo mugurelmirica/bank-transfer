@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -13,6 +15,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"iban", "currency"})})
@@ -36,6 +39,14 @@ public class Account extends BaseEntity {
 
     @JsonIgnore
     private boolean depositAllowed = true;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "source", fetch = FetchType.EAGER)
+    private Set<Transfer> withdrawTransfers;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "target", fetch = FetchType.EAGER)
+    private Set<Transfer> depositTransfers;
 
     public Account() {
     }

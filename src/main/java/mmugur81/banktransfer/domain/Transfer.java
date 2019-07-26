@@ -13,6 +13,7 @@ import mmugur81.banktransfer.exception.TransferException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -23,11 +24,11 @@ import java.util.Objects;
 @Entity
 public class Transfer extends BaseEntity {
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "source_account_id")
     private Account source;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "target_account_id")
     private Account target;
 

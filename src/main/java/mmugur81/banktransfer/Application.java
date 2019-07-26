@@ -49,6 +49,7 @@ public class Application {
         app.post(AccountController.PATH, accountController.create());
         app.get(AccountController.PATH, accountController.list());
         app.get(AccountController.PATH + "/:id", accountController.get());
+        app.get(AccountController.PATH + "/:id/transfers", accountController.listTransfersForAccount());
 
         TransferController transferController = injector.getInstance(TransferController.class);
         app.post(TransferController.PATH, transferController.createAndProcess());
