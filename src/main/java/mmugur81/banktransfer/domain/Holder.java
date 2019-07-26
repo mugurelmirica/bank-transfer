@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Objects;
 
 /**
  * Owner of a bank account
  */
 @Entity
+@Table
 @Getter
 @Setter
 public class Holder extends BaseEntity {

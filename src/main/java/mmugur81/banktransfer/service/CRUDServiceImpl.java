@@ -3,7 +3,6 @@ package mmugur81.banktransfer.service;
 import mmugur81.banktransfer.repository.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -62,15 +61,9 @@ public class CRUDServiceImpl<T> implements CRUDService<T> {
     @Override
     public void update(T t) {
         try (Session session = sessionFactory.openSession()) {
-            Transaction tx = session.getTransaction();
-            try {
-                tx.begin();
-                session.update(t);
-                tx.commit();
-            } catch (Exception e) {
-                e.printStackTrace();
-                tx.rollback();
-            }
+            session.beginTransaction();
+            session.update(t);
+            session.getTransaction().commit();
         }
     }
 }

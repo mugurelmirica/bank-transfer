@@ -6,6 +6,8 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 
 @Log
 public class HibernateUtil {
@@ -35,6 +37,21 @@ public class HibernateUtil {
                 StandardServiceRegistryBuilder.destroy(registry);
             }
         }
+        /*try
+        {
+            if (sessionFactory == null)
+            {
+                Configuration configuration = new Configuration().configure(HibernateUtil.class.getResource("/hibernate.cfg.xml"));
+                StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
+                serviceRegistryBuilder.applySettings(configuration.getProperties());
+                ServiceRegistry serviceRegistry = serviceRegistryBuilder.build();
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+            }
+        } catch (Exception ex)
+        {
+            log.severe("Initial SessionFactory creation failed." + ex);
+            throw new ExceptionInInitializerError(ex);
+        }*/
     }
 
     public static SessionFactory getSessionFactory() {
