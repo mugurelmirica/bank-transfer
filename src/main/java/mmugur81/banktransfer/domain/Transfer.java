@@ -1,7 +1,6 @@
 package mmugur81.banktransfer.domain;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import mmugur81.banktransfer.exception.AccountsIdenticalException;
 import mmugur81.banktransfer.exception.InsufficientFundsException;
@@ -12,6 +11,8 @@ import mmugur81.banktransfer.exception.TransferAlreadyProcessedException;
 import mmugur81.banktransfer.exception.TransferException;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -19,40 +20,55 @@ import java.util.Objects;
 
 @Log
 @Getter
-@RequiredArgsConstructor
+@Entity
 public class Transfer extends BaseEntity {
 
     @OneToOne
-    private final Account source;
+    @JoinColumn(name = "source_account_id")
+    private Account source;
 
     @OneToOne
-    private final Account target;
+    @JoinColumn(name = "target_account_id")
+    private Account target;
 
     /**
      * Currency of the transfer; It can be different from both source and target accounts
      */
     @Column(nullable = false)
-    private final Currency currency;
+    private Currency currency;
 
     /**
      * Amount in transfer's currency
      */
     @Column(nullable = false)
-    private final BigDecimal amount;
+    private BigDecimal amount;
 
     /**
      * Final converted amount that will be withdrawn from source account
      */
     @Column(nullable = false)
-    private final BigDecimal amountInSourceCurrency;
+    private BigDecimal amountInSourceCurrency;
 
     /**
      * Final converted amount that will be added to target account
      */
     @Column(nullable = false)
-    private final BigDecimal amountInTargetCurrency;
+    private BigDecimal amountInTargetCurrency;
 
     private boolean processed = false;
+
+    public Transfer() {
+    }
+
+    public Transfer(Account source, Account target, Currency currency, BigDecimal amount,
+                    BigDecimal amountInSourceCurrency, BigDecimal amountInTargetCurrency) {
+        this.source = source;
+        this.target = target;
+        this.currency = currency;
+        this.amount = amount;
+        this.amountInSourceCurrency = amountInSourceCurrency;
+        this.amountInTargetCurrency = amountInTargetCurrency;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -72,7 +72,11 @@ public class TransferServiceImpl implements TransferService {
         //Do the actual transfer
         transfer.process();
 
-        // Mark the transfer as processed
+        // Update accounts and,mark the transfer as processed
+        // All of this should have been done in a synchronized way, but dont have enough time, maybe use the lock from hibernate
+
+        accountService.update(transfer.getSource());
+        accountService.update(transfer.getTarget());
         transferCRUDService.update(transfer);
     }
 
