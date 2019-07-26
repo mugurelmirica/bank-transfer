@@ -16,13 +16,13 @@ import java.util.Objects;
 public class Account extends BaseEntity {
 
     @OneToOne
-    private final Holder holder;
+    private Holder holder;
 
     @Column(nullable = false)
-    private final String iban;
+    private String iban;
 
     @Column(nullable = false)
-    private final Currency currency;
+    private Currency currency;
 
     // Amount cannot be set directly
     private BigDecimal amount = new BigDecimal(0);
@@ -32,6 +32,9 @@ public class Account extends BaseEntity {
 
     @JsonIgnore
     private boolean depositAllowed = true;
+
+    public Account() {
+    }
 
     public Account(Holder holder, String iban, Currency currency, BigDecimal initialAmount) {
         this.holder = holder;

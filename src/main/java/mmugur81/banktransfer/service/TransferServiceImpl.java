@@ -77,7 +77,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void myLog(String message, long sourceId, long targetId) {
-        log.info(String.format("[Pid:%s] Transfer [%s -> %s] ",
-                Thread.currentThread().getId(), sourceId, targetId).concat(message));
+//        log.info(String.format("[Pid:%s] Transfer [%s -> %s] ",
+//                Thread.currentThread().getId(), sourceId, targetId).concat(message));
     }
 }
