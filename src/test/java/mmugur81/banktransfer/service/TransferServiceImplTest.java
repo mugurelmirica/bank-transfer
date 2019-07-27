@@ -15,11 +15,21 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Optional;
 
-import static mmugur81.banktransfer.TestUtils.*;
+import static mmugur81.banktransfer.TestUtils.DOLLAR;
+import static mmugur81.banktransfer.TestUtils.EURO;
+import static mmugur81.banktransfer.TestUtils.IBAN1;
+import static mmugur81.banktransfer.TestUtils.IBAN2;
+import static mmugur81.banktransfer.TestUtils.POUNDS;
+import static mmugur81.banktransfer.TestUtils.newAccount;
+import static mmugur81.banktransfer.TestUtils.newTransferDto;
+import static mmugur81.banktransfer.TestUtils.no100;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TransferServiceImplTest {
 

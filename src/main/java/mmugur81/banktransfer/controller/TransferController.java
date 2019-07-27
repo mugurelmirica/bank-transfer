@@ -8,6 +8,7 @@ import mmugur81.banktransfer.service.TransferService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityExistsException;
 
 @Singleton
 public class TransferController {
@@ -28,6 +29,15 @@ public class TransferController {
             // Immediately process. It can also be done separately if desired
             transferService.process(transfer);
 
+            context.json(transfer);
+        };
+    }
+
+    public Handler get() {
+        return context -> {
+            long id = Long.parseLong(context.pathParam("id"));
+            Transfer transfer = transferService.get(id)
+                    .orElseThrow(EntityExistsException::new);
             context.json(transfer);
         };
     }

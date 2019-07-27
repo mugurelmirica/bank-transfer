@@ -55,6 +55,7 @@ public class Application {
 
         TransferController transferController = injector.getInstance(TransferController.class);
         app.post(TransferController.PATH, transferController.createAndProcess());
+        app.get(TransferController.PATH + "/:id", transferController.get());
 
         // Handle some errors ------------------------------------------------------------------------------------------
         app.exception(EntityNotFoundException.class, (e, ctx) -> {

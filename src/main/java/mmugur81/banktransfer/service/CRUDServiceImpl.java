@@ -48,6 +48,16 @@ public class CRUDServiceImpl<T> implements CRUDService<T> {
     }
 
     @Override
+    public Object getWithClass(long id, String className) {
+        Object result;
+        try (Session session = sessionFactory.openSession()) {
+            result = session.get(className, id);
+        }
+
+        return result;
+    }
+
+    @Override
     public List<T> list() {
         List<T> list;
 

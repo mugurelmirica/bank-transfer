@@ -9,6 +9,7 @@ import mmugur81.banktransfer.exception.TransferException;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Log
 public class TransferServiceImpl implements TransferService {
@@ -73,11 +74,17 @@ public class TransferServiceImpl implements TransferService {
         transfer.process();
 
         // Update accounts and,mark the transfer as processed
-        // All of this should have been done in a synchronized way, but dont have enough time, maybe use the lock from hibernate
+        // All of this should have been done in a synchronized way, maybe use the lock from hibernate
 
         accountService.update(transfer.getSource());
         accountService.update(transfer.getTarget());
         transferCRUDService.update(transfer);
+    }
+
+    @Override
+    public Optional<Transfer> get(long id) {
+        Transfer transfer = (Transfer) transferCRUDService.getWithClass(id, Transfer.class.getName());
+        return Optional.ofNullable(transfer);
     }
 
     private void myLog(String message, long sourceId, long targetId) {

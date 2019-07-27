@@ -10,6 +10,8 @@ import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.Currency;
 
+import static mmugur81.banktransfer.service.CurrencyConverterImpl.ROUND_DECIMALS;
+
 @Data
 public class TransferInfoDto {
 
@@ -28,13 +30,13 @@ public class TransferInfoDto {
 
 
     public TransferInfoDto(Transfer transfer, TransferType type) {
-        BigDecimal convertedAmount;
+        BigDecimal converted;
         if (type.equals(TransferType.WITHDRAWAL)) {
             this.accountIBAN = transfer.getTarget().getIban();
-            convertedAmount = transfer.getAmountInTargetCurrency();
+            converted = transfer.getAmountInSourceCurrency();
         } else {
             this.accountIBAN = transfer.getSource().getIban();
-            convertedAmount = transfer.getAmountInSourceCurrency();
+            converted = transfer.getAmountInTargetCurrency();
         }
 
         this.id = transfer.getId();
@@ -43,6 +45,6 @@ public class TransferInfoDto {
 
         MathContext mathContext = new MathContext(2, RoundingMode.HALF_UP);
         this.amount = transfer.getAmount().round(mathContext).doubleValue();
-        this.convertedAmount = convertedAmount.round(mathContext).doubleValue();
+        this.convertedAmount = converted.setScale(ROUND_DECIMALS, RoundingMode.HALF_UP).doubleValue();
     }
 }

@@ -57,7 +57,7 @@ public class AccountController {
             result.put(TransferType.DEPOSIT,
                     account.getDepositTransfers()
                             .stream()
-                            .map(transfer -> new TransferInfoDto(transfer, TransferType.WITHDRAWAL))
+                            .map(transfer -> new TransferInfoDto(transfer, TransferType.DEPOSIT))
                             .collect(Collectors.toSet()));
 
             result.put(TransferType.WITHDRAWAL,
